@@ -29,7 +29,10 @@ export const Register = async (req: Request, res: Response) => {
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             email: req.body.email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: {
+                id: 1
+            }
         });
 
         res.status(201).send(user);
