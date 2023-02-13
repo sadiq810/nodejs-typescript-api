@@ -20,6 +20,8 @@ export const Register = async (req: Request, res: Response) => {
         });
     }
 
+    let hashedPassword = await bcrypt.hash(req.body.password, 10);
+
     const repository = getManager().getRepository(User);
 
     try {
@@ -27,10 +29,10 @@ export const Register = async (req: Request, res: Response) => {
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             email: req.body.email,
-            password: await bcrypt.hash(req.body.password, 10)
+            password: hashedPassword
         });
 
-        res.send(user);
+        res.status(201).send(user);
     } catch (e: any) {
         res.status(500).send({message: e.message});
     }
@@ -57,7 +59,7 @@ export const Login = async (req: Request, res: Response) => {
         maxAge: 24 * 60 * 60 *1000 //1 day.
     });
 
-    res.send({
+    res.status(200).send({
         message: 'success'
     });
 }
@@ -82,7 +84,7 @@ export const UpdateProfile = async (req: Request, res: Response) => {
 
     let {password, ...data} = await repository.findOne(user.id);
 
-    res.send(data);
+    res.status(200).send(data);
 }
 
 export const UpdatePassword = async (req: Request, res: Response) => {
@@ -94,9 +96,11 @@ export const UpdatePassword = async (req: Request, res: Response) => {
         return res.status(400).send({message: 'Old password did not match.'});
 
     let repository = getManager().getRepository(User);
+    let hashedPassword = await bcrypt.hash(req.body.password, 10);
+
     await repository.update(user.id, {
-        password: await bcrypt.hash(req.body.password, 10)
+        password: hashedPassword
     });
 
-    res.send({message: 'success'});
+    res.status(200).send({message: 'success'});
 }
